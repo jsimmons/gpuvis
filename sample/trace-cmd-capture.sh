@@ -21,12 +21,17 @@ echo ${CMD}
 $CMD
 
 # Extract i915-perf trace
-CMD="i915-perf-control -d trace_${DATE}.i915-dat"
+CMD="i915-perf-control -f /tmp/.i915-perf-record -d trace_${DATE}.i915-dat"
 echo ${CMD}
 $CMD
 
 # Extract trace
-CMD="trace-cmd extract -k -o trace_${DATE}.dat"
+CMD="trace-cmd extract -k -o trace_${DATE}_7.dat"
+echo ${CMD}
+$CMD
+
+# Convert trace to version 6
+CMD="trace-cmd convert --file-version 6 -i trace_${DATE}_7.dat -o trace_${DATE}.dat"
 echo ${CMD}
 $CMD
 

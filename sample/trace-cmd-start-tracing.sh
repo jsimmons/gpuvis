@@ -12,21 +12,8 @@ if [ ! -u "${TRACECMD}" ]; then
     exit -1
 fi
 
-if [ "${USE_I915_PERF}" ]; then
-    if [ -z "${I915_PERF_METRIC}" ]; then
-        echo "WARNING: Missing I915_PERF_METRIC value. Using default value 'RenderBasic'."
-        I915_PERF_METRIC="RenderBasic"
-    fi
-
-    if [ -z "${I915_PERF_ENGINE_CLASS}" ]; then
-        echo "WARNING: Missing I915_PERF_ENGINE_CLASS value. Using default value 0 (Render Class)."
-        I915_PERF_ENGINE_CLASS=0
-    fi
-
-    if [ -z "${I915_PERF_ENGINE_INSTANCE}" ]; then
-        echo "WARNING: Missing I915_PERF_ENGINE_INSTANCE value. Using default instance 0."
-        I915_PERF_ENGINE_INSTANCE=0
-    fi
+if [ -z "${I915_PERF_METRIC}" ]; then
+    I915_PERF_METRIC="RenderBasic"
 fi
 
 EVENTS=
@@ -88,16 +75,14 @@ echo $CMD
 $CMD
 
 if [ -e /tmp/.i915-perf-record ]; then
-   CMD="i915-perf-control -q"
+   CMD="i915-perf-control -f /tmp/.i915-perf-record"
    echo $CMD
    $CMD
 fi
 
-if [ "${USE_I915_PERF}" ]; then
-    CMD="i915-perf-recorder -m ${I915_PERF_METRIC} -s 8000 -k ${CLOCK} -e ${I915_PERF_ENGINE_CLASS} -i ${I915_PERF_ENGINE_INSTANCE}"
-    echo $CMD
-    $CMD &
-fi
+CMD="i915-perf-recorder -f /tmp/.i915-perf-record -m ${I915_PERF_METRIC} -s 8000 -k ${CLOCK}"
+echo $CMD
+$CMD &
 
 echo
 
